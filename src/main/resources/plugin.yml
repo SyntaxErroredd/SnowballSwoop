@@ -1,0 +1,13 @@
+name: SnowballSwoop
+version: ${project.version}
+main: me.syntaxerror.snowballswoop.SnowballSwoop
+api-version: 1.17
+authors: [ SyntaxError ]
+description: A Minecraft Minigame
+commands:
+  snowballswoop:
+    description: starts a snowball swoop game
+    usage: /<command>
+  snowballswoopgivepowerups:
+    description: gives all powerups
+    usage: /<command>
