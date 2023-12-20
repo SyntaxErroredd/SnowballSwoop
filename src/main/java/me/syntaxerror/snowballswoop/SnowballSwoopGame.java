@@ -13,12 +13,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.*;
 
 import java.io.*;
 import java.util.*;
@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 public class SnowballSwoopGame implements Listener {
 
+    public SnowballSwoopGame INSTANCE;
     private static final String[] hitQuotes = {
             "<hit> forgot to dodge!",
             "Sigh, <hit> was hit!",
@@ -33,14 +34,18 @@ public class SnowballSwoopGame implements Listener {
             "<hit> forgot the objective of the game!",
             "<hit> fell asleep!"
     };
-
     private GameState gameState;
-
     private HashMap<UUID, SnowballSwoopPlayer> playerLink = new HashMap<>();
+    public int time = 8 * 60;
 
     public SnowballSwoopGame(List<Player> players){
+        INSTANCE = this;
         preparePlayers(players);
         onStart();
+    }
+
+    public Set<SnowballSwoopPlayer> getRegisteredPlayers() {
+        return new HashSet<>(playerLink.values());
     }
 
     public void preparePlayers(List<Player> players){
@@ -48,7 +53,7 @@ public class SnowballSwoopGame implements Listener {
         copyWorld("snowballswoopbackup", "snowballswooptest", "uid.dat");
         World world = loadWorld("snowballswooptest");
         for(Player player : players){
-            playerLink.put(player.getUniqueId(), new SnowballSwoopPlayer(player.getUniqueId(), player.getInventory(), player.getLocation()));
+            playerLink.put(player.getUniqueId(), new SnowballSwoopPlayer(player.getUniqueId(), this, player.getInventory(), player.getLocation()));
             player.setGameMode(GameMode.SURVIVAL);
             player.teleport(new Location(world, 4.5, 90, -0.5));
             player.getInventory().clear();
@@ -123,7 +128,6 @@ public class SnowballSwoopGame implements Listener {
                 }
 
                 if(i == 0){
-                    updateLeaderBoard();
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()) {
                         snowballSwoopPlayer.getPlayer().sendTitle(ChatColor.RED + "Game Starts in:", "", 0, 20, 0);
                     }
@@ -146,6 +150,7 @@ public class SnowballSwoopGame implements Listener {
                 if(i == 4){
                     gameState = GameState.GRACE;
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        snowballSwoopPlayer.getGameScoreboard().createScoreboard();
                         snowballSwoopPlayer.getPlayer().sendTitle(ChatColor.GREEN + "Take off!", ChatColor.GREEN + "Grace Period: 20 seconds", 0, 40, 0);
                         snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.GREEN + "Grace Period started! Find a good spot!");
                         int radius = 20;
@@ -310,17 +315,20 @@ public class SnowballSwoopGame implements Listener {
                 if(gameState.equals(GameState.ENDED)){
                     cancel();
                 }
+
+                for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                    snowballSwoopPlayer.updateScoreboard();
+                }
+
                 i++;
+                if(i > 24)
+                    time--;
+                //TODO Time start at correct time and 8 minutes
             }
         }.runTaskTimer(SnowballSwoop.getInstance(), 100L, 20L);
     }
 
-    public void givePoints(Player player, int points){
-        playerLink.get(player.getUniqueId()).setPoints(playerLink.get(player.getUniqueId()).getPoints() + points);
-        updateLeaderBoard();
-    }
-
-    public void updateLeaderBoard(){
+    /*public void updateLeaderBoard(){
         for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
             displayMinigameScoreboard(snowballSwoopPlayer.getPlayer());
         }
@@ -334,7 +342,7 @@ public class SnowballSwoopGame implements Listener {
         ScoreboardManager manager = Bukkit.getScoreboardManager();
         Scoreboard scoreboard = manager.getNewScoreboard();
 
-        Objective objective = scoreboard.registerNewObjective("minigame", "dummy", ChatColor.GOLD + "Syntax's Prototype");
+        Objective objective = scoreboard.registerNewObjective("minigame", "dummy", ChatColor.GOLD + "MCMT");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         Score scoreGame = objective.getScore(ChatColor.GREEN + "Game: " + game);
@@ -421,15 +429,18 @@ public class SnowballSwoopGame implements Listener {
         }
 
         player.setScoreboard(scoreboard);
-    }
+    }*/
 
     public void onEnd(){
+        HashMap<UUID, Integer> playerPoints = new HashMap<>();
         for (SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()) {
+            if(!snowballSwoopPlayer.getPlayer().isOnline())
+                return;
             snowballSwoopPlayer.getPlayer().sendTitle(ChatColor.RED + "Minigame Over!", ChatColor.RED + "GG", 2, 90, 2);
             snowballSwoopPlayer.getPlayer().playSound(snowballSwoopPlayer.getPlayer().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 5, 5);
             if(!snowballSwoopPlayer.isEliminated()){
                 snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.GRAY + "You survived the entire minigame. " + ChatColor.AQUA + "(+25 points)");
-                givePoints(snowballSwoopPlayer.getPlayer(), 25);
+                snowballSwoopPlayer.givePoints(25);
             }
             endMessage(snowballSwoopPlayer.getPlayer());
             snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.GRAY + "Transporting you back to reality!");
@@ -440,12 +451,15 @@ public class SnowballSwoopGame implements Listener {
                     snowballSwoopPlayer.getPlayer().teleport(snowballSwoopPlayer.getOriginalLocation());
                     snowballSwoopPlayer.getPlayer().getInventory().setContents(snowballSwoopPlayer.getOriginalInventory().getContents());
                     snowballSwoopPlayer.getPlayer().updateInventory();
-                    snowballSwoopPlayer.getPlayer().setScoreboard(null);
+                    snowballSwoopPlayer.getGameScoreboard().destroy();
+                    playerPoints.put(snowballSwoopPlayer.getUuid(), snowballSwoopPlayer.getPoints());
                 }
             }.runTaskLater(SnowballSwoop.getInstance(), 100L);
         }
         gameState = GameState.ENDED;
         playerLink.clear();
+        SnowballSwoopGameEndEvent event = new SnowballSwoopGameEndEvent(playerPoints);
+        Bukkit.getServer().getPluginManager().callEvent(event);
     }
 
     public void endMessage(Player player){
@@ -540,7 +554,7 @@ public class SnowballSwoopGame implements Listener {
                     hitPlayer.setGameMode(GameMode.SPECTATOR);
                     playerLink.get(hitPlayer.getUniqueId()).setEliminated(true);
                     shootPlayer.sendMessage(ChatColor.RED + "You have successfully eliminated " + hitPlayer.getPlayerListName() + ". " + ChatColor.AQUA + "(+10 points)");
-                    givePoints(shootPlayer, 10);
+                    playerLink.get(shootPlayer.getUniqueId()).givePoints(10);
                     playerLink.get(hitPlayer.getUniqueId()).setEliminations(playerLink.get(hitPlayer.getUniqueId()).getEliminations() + 1);
                     hitPlayer.sendMessage(ChatColor.RED + "You were eliminated by " + shootPlayer.getPlayerListName());
 
@@ -564,7 +578,7 @@ public class SnowballSwoopGame implements Listener {
                 } else {
                     hitPlayer.setHealth(hitPlayer.getHealth() - 2);
                     shootPlayer.sendMessage(ChatColor.GRAY + "You successfully hit " + ChatColor.GOLD + hitPlayer.getPlayerListName() + ChatColor.GRAY + ". " + ChatColor.AQUA + "(+5 points)");
-                    givePoints(shootPlayer, 5);
+                    playerLink.get(shootPlayer.getUniqueId()).givePoints(5);
                     Invincibility.setCooldown(hitPlayer, 2);
                     hitPlayer.sendMessage(ChatColor.RED + "You were hit by " + shootPlayer.getPlayerListName());
 
@@ -637,5 +651,14 @@ public class SnowballSwoopGame implements Listener {
                     throw new IllegalStateException("Multiple players still remain");
                 });
         lastPlayer.ifPresent(player -> onEnd());
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event){
+        if(!(gameState.equals(GameState.STARTED) || gameState.equals(GameState.GRACE)))
+            return;
+        if(!playerLink.containsKey(event.getPlayer().getUniqueId()))
+            return;
+        playerLink.get(event.getPlayer().getUniqueId()).getGameScoreboard().createScoreboard();
     }
 }

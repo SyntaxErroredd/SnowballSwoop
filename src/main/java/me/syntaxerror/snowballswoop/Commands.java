@@ -1,10 +1,6 @@
 package me.syntaxerror.snowballswoop;
 
-import me.syntaxerror.snowballswoop.PowerUps.PowerUpManager;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

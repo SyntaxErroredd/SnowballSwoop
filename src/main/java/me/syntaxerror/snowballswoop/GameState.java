@@ -1,5 +1,8 @@
 package me.syntaxerror.snowballswoop;
 
 public enum GameState {
-    WAITING, GRACE, STARTED, ENDED
+    WAITING,
+    GRACE,
+    STARTED,
+    ENDED
 }
