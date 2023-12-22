@@ -27,7 +27,7 @@ public class Commands implements CommandExecutor {
                         for (String name : args) {
                             playerList.add(Bukkit.getPlayer(name));
                         }
-                        SnowballSwoop.getInstance().getServer().getPluginManager().registerEvents(new SnowballSwoopGame(playerList), SnowballSwoop.getInstance());
+                        new SnowballSwoopGame(playerList);
                     }
                 }
                 if(cmd.getName().equalsIgnoreCase("snowballswoopgivepowerups")){

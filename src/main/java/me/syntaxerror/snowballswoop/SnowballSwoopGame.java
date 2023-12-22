@@ -39,6 +39,7 @@ public class SnowballSwoopGame implements Listener {
     public int time = 8 * 60;
 
     public SnowballSwoopGame(List<Player> players){
+        SnowballSwoop.getInstance().getServer().getPluginManager().registerEvents(this, SnowballSwoop.getInstance());
         INSTANCE = this;
         preparePlayers(players);
         onStart();
@@ -444,22 +445,23 @@ public class SnowballSwoopGame implements Listener {
             }
             endMessage(snowballSwoopPlayer.getPlayer());
             snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.GRAY + "Transporting you back to reality!");
-
-            new BukkitRunnable(){
-                @Override
-                public void run() {
+            playerPoints.put(snowballSwoopPlayer.getUuid(), snowballSwoopPlayer.getPoints());
+        }
+        new BukkitRunnable(){
+            @Override
+            public void run() {
+                for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
                     snowballSwoopPlayer.getPlayer().teleport(snowballSwoopPlayer.getOriginalLocation());
                     snowballSwoopPlayer.getPlayer().getInventory().setContents(snowballSwoopPlayer.getOriginalInventory().getContents());
                     snowballSwoopPlayer.getPlayer().updateInventory();
                     snowballSwoopPlayer.getGameScoreboard().destroy();
-                    playerPoints.put(snowballSwoopPlayer.getUuid(), snowballSwoopPlayer.getPoints());
                 }
-            }.runTaskLater(SnowballSwoop.getInstance(), 100L);
-        }
-        gameState = GameState.ENDED;
+                SnowballSwoopGameEndEvent event = new SnowballSwoopGameEndEvent(playerPoints);
+                Bukkit.getServer().getPluginManager().callEvent(event);
+            }
+        }.runTaskLater(SnowballSwoop.getInstance(), 100L);
         playerLink.clear();
-        SnowballSwoopGameEndEvent event = new SnowballSwoopGameEndEvent(playerPoints);
-        Bukkit.getServer().getPluginManager().callEvent(event);
+        gameState = GameState.ENDED;
     }
 
     public void endMessage(Player player){

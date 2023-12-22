@@ -21,4 +21,8 @@ public class SnowballSwoopGameEndEvent extends Event {
     public static HandlerList getHandlerList(){
         return handlers;
     }
+
+    public HashMap<UUID, Integer> getPlayerPoints(){
+        return playerPoints;
+    }
 }
