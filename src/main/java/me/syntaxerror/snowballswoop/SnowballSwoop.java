@@ -41,8 +41,4 @@ public final class SnowballSwoop extends JavaPlugin {
     public static SnowballSwoop getInstance(){
         return instance;
     }
-
-    public static void createSnowballSwoopGame(List<Player> playerList){
-        new SnowballSwoopGame(playerList);
-    }
 }

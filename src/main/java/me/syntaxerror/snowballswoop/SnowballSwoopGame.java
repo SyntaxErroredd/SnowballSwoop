@@ -68,8 +68,8 @@ public class SnowballSwoopGame implements Listener {
             player.setHealth(20);
             player.setFoodLevel(20);
             player.sendMessage(ChatColor.GREEN + "Successfully added you into Snowball Swoop. Get ready for take off and good luck!");
-            gameState = GameState.WAITING;
         }
+        gameState = GameState.WAITING;
     }
 
     public boolean unloadWorld(String worldName) {
@@ -111,6 +111,8 @@ public class SnowballSwoopGame implements Listener {
     }
 
     public void onStart(){
+        SnowballSwoopGameStartEvent event = new SnowballSwoopGameStartEvent();
+        Bukkit.getServer().getPluginManager().callEvent(event);
         new BukkitRunnable(){
             int i = 0;
             public void run(){
@@ -119,6 +121,8 @@ public class SnowballSwoopGame implements Listener {
                     if(gameState.equals(GameState.GRACE) || gameState.equals(GameState.STARTED)) {
                         for (SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()) {
                             Player player = snowballSwoopPlayer.getPlayer();
+                            if(player == null)
+                                continue;
                             if (!player.getInventory().containsAtLeast(ItemManager.Snowball, 80)) {
                                 player.getInventory().addItem(ItemManager.Snowball);
                             } else {
@@ -435,13 +439,13 @@ public class SnowballSwoopGame implements Listener {
     public void onEnd(){
         HashMap<UUID, Integer> playerPoints = new HashMap<>();
         for (SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()) {
-            if(!snowballSwoopPlayer.getPlayer().isOnline())
-                return;
+            if(snowballSwoopPlayer == null)
+                continue;
             snowballSwoopPlayer.getPlayer().sendTitle(ChatColor.RED + "Minigame Over!", ChatColor.RED + "GG", 2, 90, 2);
             snowballSwoopPlayer.getPlayer().playSound(snowballSwoopPlayer.getPlayer().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 5, 5);
             if(!snowballSwoopPlayer.isEliminated()){
-                snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.GRAY + "You survived the entire minigame. " + ChatColor.AQUA + "(+25 points)");
-                snowballSwoopPlayer.givePoints(25);
+                snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.GRAY + "You survived the entire minigame. " + ChatColor.AQUA + "(+150 points)");
+                snowballSwoopPlayer.givePoints(150);
             }
             endMessage(snowballSwoopPlayer.getPlayer());
             snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.GRAY + "Transporting you back to reality!");
@@ -458,10 +462,10 @@ public class SnowballSwoopGame implements Listener {
                 }
                 SnowballSwoopGameEndEvent event = new SnowballSwoopGameEndEvent(playerPoints);
                 Bukkit.getServer().getPluginManager().callEvent(event);
+                playerLink.clear();
+                gameState = GameState.ENDED;
             }
-        }.runTaskLater(SnowballSwoop.getInstance(), 100L);
-        playerLink.clear();
-        gameState = GameState.ENDED;
+        }.runTaskLater(SnowballSwoop.getInstance(), 200L);
     }
 
     public void endMessage(Player player){
@@ -524,9 +528,6 @@ public class SnowballSwoopGame implements Listener {
         Player player = event.getPlayer();
         if(!playerLink.containsKey(player.getUniqueId()))
             return;
-        if (player.getInventory().getItemInMainHand().getItemMeta() == null || player.getInventory().getItemInMainHand().getItemMeta().getLore() == null
-                || !player.getInventory().getItemInMainHand().getItemMeta().getLore().contains(ItemManager.Snowball.getItemMeta().getLore().get(0)))
-            return;
         if (gameState.equals(GameState.WAITING) || gameState.equals(GameState.GRACE) || gameState.equals(GameState.ENDED))
             event.setCancelled(true);
     }
@@ -555,8 +556,8 @@ public class SnowballSwoopGame implements Listener {
                 if (hitPlayer.getHealth() == 2) {
                     hitPlayer.setGameMode(GameMode.SPECTATOR);
                     playerLink.get(hitPlayer.getUniqueId()).setEliminated(true);
-                    shootPlayer.sendMessage(ChatColor.RED + "You have successfully eliminated " + hitPlayer.getPlayerListName() + ". " + ChatColor.AQUA + "(+10 points)");
-                    playerLink.get(shootPlayer.getUniqueId()).givePoints(10);
+                    shootPlayer.sendMessage(ChatColor.RED + "You have successfully eliminated " + hitPlayer.getPlayerListName() + ". " + ChatColor.AQUA + "(+50 points)");
+                    playerLink.get(shootPlayer.getUniqueId()).givePoints(50);
                     playerLink.get(hitPlayer.getUniqueId()).setEliminations(playerLink.get(hitPlayer.getUniqueId()).getEliminations() + 1);
                     hitPlayer.sendMessage(ChatColor.RED + "You were eliminated by " + shootPlayer.getPlayerListName());
 
@@ -579,8 +580,8 @@ public class SnowballSwoopGame implements Listener {
                     lastPlayer.ifPresent(player -> onEnd());
                 } else {
                     hitPlayer.setHealth(hitPlayer.getHealth() - 2);
-                    shootPlayer.sendMessage(ChatColor.GRAY + "You successfully hit " + ChatColor.GOLD + hitPlayer.getPlayerListName() + ChatColor.GRAY + ". " + ChatColor.AQUA + "(+5 points)");
-                    playerLink.get(shootPlayer.getUniqueId()).givePoints(5);
+                    shootPlayer.sendMessage(ChatColor.GRAY + "You successfully hit " + ChatColor.GOLD + hitPlayer.getPlayerListName() + ChatColor.GRAY + ". " + ChatColor.AQUA + "(+25 points)");
+                    playerLink.get(shootPlayer.getUniqueId()).givePoints(25);
                     Invincibility.setCooldown(hitPlayer, 2);
                     hitPlayer.sendMessage(ChatColor.RED + "You were hit by " + shootPlayer.getPlayerListName());
 
@@ -653,6 +654,9 @@ public class SnowballSwoopGame implements Listener {
                     throw new IllegalStateException("Multiple players still remain");
                 });
         lastPlayer.ifPresent(player -> onEnd());
+
+        if(playerLink.values().stream().allMatch(SnowballSwoopPlayer::isEliminated))
+            onEnd();
     }
 
     @EventHandler
@@ -661,6 +665,6 @@ public class SnowballSwoopGame implements Listener {
             return;
         if(!playerLink.containsKey(event.getPlayer().getUniqueId()))
             return;
-        playerLink.get(event.getPlayer().getUniqueId()).getGameScoreboard().createScoreboard();
+        playerLink.get(event.getPlayer().getUniqueId()).getGameScoreboard().displayScoreboard();
     }
 }

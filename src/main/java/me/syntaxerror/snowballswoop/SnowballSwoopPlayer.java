@@ -114,5 +114,11 @@ public class SnowballSwoopPlayer{
 
     public void updateScoreboard() {
         gameScoreboard.updateScoreboard();
+        HashMap<UUID, Integer> playerPoints = new HashMap<>();
+        for(SnowballSwoopPlayer player : snowballSwoopGame.getRegisteredPlayers()){
+            playerPoints.put(player.getUuid(), player.getPoints());
+        }
+        SnowballSwoopScoreboardUpdateEvent event = new SnowballSwoopScoreboardUpdateEvent(playerPoints);
+        Bukkit.getServer().getPluginManager().callEvent(event);
     }
 }
