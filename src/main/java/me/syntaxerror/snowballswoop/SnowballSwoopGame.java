@@ -35,7 +35,7 @@ public class SnowballSwoopGame implements Listener {
             "<hit> fell asleep!"
     };
     private GameState gameState;
-    private HashMap<UUID, SnowballSwoopPlayer> playerLink = new HashMap<>();
+    private final HashMap<UUID, SnowballSwoopPlayer> playerLink = new HashMap<>();
     public int time = 8 * 60;
 
     public SnowballSwoopGame(List<Player> players){
@@ -54,6 +54,7 @@ public class SnowballSwoopGame implements Listener {
         copyWorld("snowballswoopbackup", "snowballswooptest", "uid.dat");
         World world = loadWorld("snowballswooptest");
         for(Player player : players){
+            if (!player.isOnline()) continue;
             playerLink.put(player.getUniqueId(), new SnowballSwoopPlayer(player.getUniqueId(), this, player.getInventory(), player.getLocation()));
             player.setGameMode(GameMode.SURVIVAL);
             player.teleport(new Location(world, 4.5, 90, -0.5));
@@ -120,6 +121,7 @@ public class SnowballSwoopGame implements Listener {
                 if(i % 2 == 0){
                     if(gameState.equals(GameState.GRACE) || gameState.equals(GameState.STARTED)) {
                         for (SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()) {
+                            if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                             Player player = snowballSwoopPlayer.getPlayer();
                             if(player == null)
                                 continue;
@@ -134,27 +136,32 @@ public class SnowballSwoopGame implements Listener {
 
                 if(i == 0){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()) {
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendTitle(ChatColor.RED + "Game Starts in:", "", 0, 20, 0);
                     }
                 }
                 if(i == 1){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendTitle(ChatColor.RED + "3", "", 0, 20, 0);
                     }
                 }
                 if(i == 2){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendTitle(ChatColor.GOLD + "2", "", 0, 20, 0);
                     }
                 }
                 if(i == 3){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendTitle(ChatColor.YELLOW + "1", "", 0, 20, 0);
                     }
                 }
                 if(i == 4){
                     gameState = GameState.GRACE;
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getGameScoreboard().createScoreboard();
                         snowballSwoopPlayer.getPlayer().sendTitle(ChatColor.GREEN + "Take off!", ChatColor.GREEN + "Grace Period: 20 seconds", 0, 40, 0);
                         snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.GREEN + "Grace Period started! Find a good spot!");
@@ -178,138 +185,165 @@ public class SnowballSwoopGame implements Listener {
                 }
                 if(i == 14){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.WHITE + "Grace Period ends in " + ChatColor.YELLOW + "10" + ChatColor.WHITE + " seconds.");
                     }
                 }
                 if(i == 19){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.WHITE + "Grace Period ends in " + ChatColor.GOLD + "5" + ChatColor.WHITE + " seconds.");
                     }
                 }
                 if(i == 20){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.WHITE + "Grace Period ends in " + ChatColor.GOLD + "4" + ChatColor.WHITE + " seconds.");
                     }
                 }
                 if(i == 21){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.WHITE + "Grace Period ends in " + ChatColor.GOLD + "3" + ChatColor.WHITE + " seconds.");
                     }
                 }
                 if(i == 22){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.WHITE + "Grace Period ends in " + ChatColor.RED + "2" + ChatColor.WHITE + " seconds.");
                     }
                 }
                 if(i == 23){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.WHITE + "Grace Period ends in " + ChatColor.RED + "1" + ChatColor.WHITE + " seconds.");
                     }
                 }
                 if(i == 24){
                     gameState = GameState.STARTED;
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendTitle(ChatColor.RED + "Grace Period Over!", ChatColor.GOLD + "Good luck!", 0, 40, 0);
                         snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.RED + "Grace Period over, snowballs will now deal damage. You have 8 minutes to eliminate as many players.");
                     }
                 }
                 if(i == 54){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         PowerUpManager.createPowerUp(snowballSwoopPlayer.getPlayer());
                     }
                 }
                 if(i == 104){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         PowerUpManager.createPowerUp(snowballSwoopPlayer.getPlayer());
                     }
                 }
                 if(i == 154){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         PowerUpManager.createPowerUp(snowballSwoopPlayer.getPlayer());
                     }
                 }
                 if(i == 204){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         PowerUpManager.createPowerUp(snowballSwoopPlayer.getPlayer());
                     }
                 }
                 if(i == 254){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         PowerUpManager.createPowerUp(snowballSwoopPlayer.getPlayer());
                     }
                 }
                 if(i == 304){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         PowerUpManager.createPowerUp(snowballSwoopPlayer.getPlayer());
                     }
                 }
                 if(i == 354){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         PowerUpManager.createPowerUp(snowballSwoopPlayer.getPlayer());
                     }
                 }
                 if(i == 404){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         PowerUpManager.createPowerUp(snowballSwoopPlayer.getPlayer());
                     }
                 }
                 if(i == 454){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         PowerUpManager.createPowerUp(snowballSwoopPlayer.getPlayer());
                     }
                 }
                 if(i == 264){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.GREEN + "4" + ChatColor.WHITE + " minutes remaining!");
                     }
                 }
                 if(i == 384){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.GREEN + "2" + ChatColor.WHITE + " minutes remaining!");
                     }
                 }
                 if(i == 444){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.GREEN + "1" + ChatColor.WHITE + " minute remaining!");
                     }
                 }
                 if(i == 474){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.GREEN + "30" + ChatColor.WHITE + " seconds remaining!");
                     }
                 }
                 if(i == 484){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.GREEN + "20" + ChatColor.WHITE + " seconds remaining!");
                     }
                 }
                 if(i == 494){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.YELLOW + "10" + ChatColor.WHITE + " seconds remaining!");
                     }
                 }
                 if(i == 499){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.GOLD + "5" + ChatColor.WHITE + " seconds remaining!");
                     }
                 }
                 if(i == 500){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.GOLD + "4" + ChatColor.WHITE + " seconds remaining!");
                     }
                 }
                 if(i == 501){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.RED + "3" + ChatColor.WHITE + " seconds remaining!");
                     }
                 }
                 if(i == 502){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.RED + "2" + ChatColor.WHITE + " seconds remaining!");
                     }
                 }
                 if(i == 503){
                     for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                        if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                         snowballSwoopPlayer.getPlayer().sendMessage(ChatColor.RED + "1" + ChatColor.WHITE + " second remaining!");
                     }
                 }
@@ -322,6 +356,7 @@ public class SnowballSwoopGame implements Listener {
                 }
 
                 for(SnowballSwoopPlayer snowballSwoopPlayer : playerLink.values()){
+                    if (snowballSwoopPlayer == null || snowballSwoopPlayer.getPlayer() == null || !snowballSwoopPlayer.getPlayer().isOnline()) continue;
                     snowballSwoopPlayer.updateScoreboard();
                 }
 
@@ -545,8 +580,7 @@ public class SnowballSwoopGame implements Listener {
             event.getHitBlock().setType(Material.AIR);
             event.getEntity().getWorld().playSound(event.getEntity().getLocation(), Sound.BLOCK_SNOW_BREAK, 5, 5);
         }
-        if (event.getHitEntity() != null && event.getHitEntity() instanceof Player) {
-            Player hitPlayer = (Player) event.getHitEntity();
+        if (event.getHitEntity() != null && event.getHitEntity() instanceof Player hitPlayer) {
             Player shootPlayer = (Player) event.getEntity().getShooter();
             if(hitPlayer.equals(shootPlayer))
                 return;
@@ -554,6 +588,7 @@ public class SnowballSwoopGame implements Listener {
                 return;
             if (Invincibility.checkCooldown(hitPlayer)) {
                 if (hitPlayer.getHealth() == 2) {
+                    if (hitPlayer.getPlayer() == null || !hitPlayer.getPlayer().isOnline()) return;
                     hitPlayer.setGameMode(GameMode.SPECTATOR);
                     playerLink.get(hitPlayer.getUniqueId()).setEliminated(true);
                     shootPlayer.sendMessage(ChatColor.RED + "You have successfully eliminated " + hitPlayer.getPlayerListName() + ". " + ChatColor.AQUA + "(+50 points)");
@@ -663,8 +698,10 @@ public class SnowballSwoopGame implements Listener {
     public void onJoin(PlayerJoinEvent event){
         if(!(gameState.equals(GameState.STARTED) || gameState.equals(GameState.GRACE)))
             return;
-        if(!playerLink.containsKey(event.getPlayer().getUniqueId()))
+        if(!playerLink.containsKey(event.getPlayer().getUniqueId())) {
+            event.getPlayer().setGameMode(GameMode.SPECTATOR);
             return;
+        }
         playerLink.get(event.getPlayer().getUniqueId()).getGameScoreboard().displayScoreboard();
     }
 }
