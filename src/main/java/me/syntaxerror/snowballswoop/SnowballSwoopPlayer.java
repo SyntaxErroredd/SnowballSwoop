@@ -42,6 +42,15 @@ public class SnowballSwoopPlayer{
         return Bukkit.getPlayer(uuid);
     }
 
+    public String getName(){
+        if(Bukkit.getPlayer(uuid) == null) {
+            return Bukkit.getOfflinePlayer(uuid).getName();
+        }
+        else {
+            return Bukkit.getPlayer(uuid).getDisplayName();
+        }
+    }
+
     public SnowballSwoopGame getSnowballSwoopGame(){
         return snowballSwoopGame;
     }

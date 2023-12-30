@@ -40,7 +40,7 @@ public enum ScoreboardImpl implements Factory<SnowballSwoopPlayer, String[]> {
         }
         private String makeLine(List<SnowballSwoopPlayer> players, int place, SnowballSwoopPlayer owner) {
             SnowballSwoopPlayer player = players.get(place - 1);
-            return place + ": " + ((player == owner) ? "§6You" : player.getPlayer().getName()) + " §b" + player.getPoints();
+            return place + ": " + ((player == owner) ? "§6You" : player.getName()) + " §b" + player.getPoints();
         }
     },
     EmptyLine {
